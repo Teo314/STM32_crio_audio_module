@@ -1,0 +1,17 @@
+sd.c:22:13:SELECT	1
+sd.c:28:13:DESELECT	1
+sd.c:34:13:SPI_TxByte	2
+sd.c:41:16:SPI_RxByte	2
+sd.c:54:13:SPI_RxBytePtr	1
+sd.c:60:16:SD_ReadyWait	3
+sd.c:78:13:SD_PowerOn	5
+sd.c:121:13:SD_PowerOff	1
+sd.c:127:16:SD_CheckPower	1
+sd.c:134:13:SD_RxDataBlock	5
+sd.c:166:13:SD_TxDataBlock	8
+sd.c:217:13:SD_SendCmd	7
+sd.c:263:9:SD_disk_initialize	25
+sd.c:366:9:SD_disk_status	2
+sd.c:375:9:SD_disk_read	11
+sd.c:419:9:SD_disk_write	14
+sd.c:474:9:SD_disk_ioctl	26

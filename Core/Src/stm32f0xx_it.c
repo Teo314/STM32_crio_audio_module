@@ -52,6 +52,20 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+volatile uint8_t FatFsCnt = 0;
+volatile uint16_t LEDCnt = 0;
+volatile uint8_t LEDState = 0;
+volatile uint8_t Timer1, Timer2;
+
+void SDTimer_Handler(void)
+{
+	if(Timer1 > 0)
+		Timer1--;
+
+	if(Timer2 > 0)
+		Timer2--;
+}
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -125,7 +139,28 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+	FatFsCnt++;
+	LEDCnt++;
+	if(FatFsCnt >= 10)
+	{
+		FatFsCnt = 0;
+		SDTimer_Handler();
+	}
+	if(LEDCnt >= 1000)
+	{
+		LEDCnt = 0;
+		if (LEDState == 0)
+		{
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+			LEDState = 1;
+		}
+		else
+		{
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+			LEDState = 0;
+		}
 
+	}
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */

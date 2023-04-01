@@ -70,7 +70,6 @@ void SDTimer_Handler(void)
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_spi1_tx;
-extern I2S_HandleTypeDef hi2s1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -140,28 +139,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-	FatFsCnt++;
-	LEDCnt++;
-	if(FatFsCnt >= 10)
-	{
-		FatFsCnt = 0;
-		SDTimer_Handler();
-	}
-	if(LEDCnt >= 1000)
-	{
-		LEDCnt = 0;
-		if (LEDState == 0)
-		{
-			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-			LEDState = 1;
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
-			LEDState = 0;
-		}
 
-	}
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -188,20 +166,6 @@ void DMA1_Channel2_3_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
 
   /* USER CODE END DMA1_Channel2_3_IRQn 1 */
-}
-
-/**
-  * @brief This function handles SPI1 global interrupt.
-  */
-void SPI1_IRQHandler(void)
-{
-  /* USER CODE BEGIN SPI1_IRQn 0 */
-
-  /* USER CODE END SPI1_IRQn 0 */
-  HAL_I2S_IRQHandler(&hi2s1);
-  /* USER CODE BEGIN SPI1_IRQn 1 */
-
-  /* USER CODE END SPI1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

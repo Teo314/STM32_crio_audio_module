@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <wavPlayer.h>
 #include "main.h"
 #include "fatfs.h"
 
@@ -34,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFFER_SIZE		550
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,20 +68,6 @@ static void MX_I2S1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-FATFS fatFs;			// file system
-FIL file;				// file
-FRESULT fresult;		// to store the result
-//char buffer[1024];		// to store data
-
-UINT br, bw;
-
-/* capacity related variables */
-FATFS *pfatFs;
-DWORD fre_clust;
-uint32_t total, free_space;
-
-static int16_t audio_data[2 * BUFFER_SIZE];
 
 /* USER CODE END 0 */
 
@@ -119,25 +106,9 @@ int main(void)
   MX_I2S1_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Mount SD Card */
-  if (f_mount(&fatFs, "", 0) == FR_OK)
-  {
-	  /* Open file to write / create file if it doesn't exist */
-	  if (f_open(&file, "file1.txt", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
-	  {
-		  /* Writing text */
-		  fresult = f_puts("Test file\n", &file);
-		  /* Close file */
-		  fresult = f_close(&file);
-	  }
-  }
-
-  for (int i = 0; i < BUFFER_SIZE; i++)
-  {
-	  int16_t value = (int16_t)(32000.0 * sin(2.0 * M_PI * i / 22.0));
-	  audio_data[i * 2] = value;
-	  audio_data[i * 2 + 1] = value;
-  }
+  SDMount();
+  WAVPlayerFileSelect("test1.wav");
+  WAVPlayerPlay(&hi2s1);
 
   /* USER CODE END 2 */
 
@@ -148,8 +119,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_I2S_Transmit(&hi2s1, (uint16_t*)audio_data, 2 * BUFFER_SIZE, HAL_MAX_DELAY);
-	  HAL_Delay(500);
+	  //HAL_I2S_Transmit(&hi2s1, (uint16_t*)audio_data, 2 * BUFFER_SIZE, HAL_MAX_DELAY);
+	  //HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -216,7 +187,7 @@ static void MX_I2S1_Init(void)
   /* USER CODE END I2S1_Init 1 */
   hi2s1.Instance = SPI1;
   hi2s1.Init.Mode = I2S_MODE_MASTER_TX;
-  hi2s1.Init.Standard = I2S_STANDARD_PHILIPS;
+  hi2s1.Init.Standard = I2S_STANDARD_MSB;
   hi2s1.Init.DataFormat = I2S_DATAFORMAT_16B;
   hi2s1.Init.MCLKOutput = I2S_MCLKOUTPUT_ENABLE;
   hi2s1.Init.AudioFreq = I2S_AUDIOFREQ_44K;
@@ -364,6 +335,23 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+	bool bufferHalf = false;
+	WAVPlayerFillBuffer(&hi2s1, bufferHalf);
+}
+
+void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+	bool bufferHalf = true;
+	WAVPlayerFillBuffer(&hi2s1, bufferHalf);
+}
+
+void SendStringUART(char* s)
+{
+	HAL_UART_Transmit(&huart1, (uint8_t*)s, strlen(s), 1000);
+}
 
 /* USER CODE END 4 */
 
